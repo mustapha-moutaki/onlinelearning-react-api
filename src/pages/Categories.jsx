@@ -1,9 +1,13 @@
-import CategoriesList from '../components/categories/CategoriesList';
+import React from "react";
+import CategoriesList from "../components/categories/CategoriesList";
 
-export default function Categories() {
+const Categories = () => {
   return (
-    <div className="p-4">
+    <div>
+      <h2>Course Categories</h2>
       <CategoriesList />
     </div>
   );
-}
+};
+
+export default Categories;

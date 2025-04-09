@@ -1,24 +1,42 @@
-import { useEffect, useState } from 'react';
-import { fetchCategories } from '../../services/api';
-import CategoryCard from './CategoryCard';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import CategoryCard from "./CategoryCard";
 
-export default function CategoriesList() {
+function CategoriesList() {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchCategories()
-      .then((data) => setCategories(data))
-      .catch((error) => console.error('Erreur API :', error));
+    console.log("Fetching categories...");
+    axios
+      .get("http://127.0.0.1:8000/api/categories")
+      .then((response) => {
+        console.log("API categories response:", response.data);
+        setCategories(Array.isArray(response.data) ? response.data : []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+        setError("Failed to load categories");
+        setLoading(false);
+      });
   }, []);
 
+  if (loading) return <p>Loading categories...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
-    <section className="p-6 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Categories</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {categories.map((category, index) => (
-          <CategoryCard key={index} name={category.name} />
-        ))}
-      </div>
-    </section>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px" }}>
+      {categories.length === 0 ? (
+        <p>No categories available</p>
+      ) : (
+        categories.map((category, index) => (
+          <CategoryCard key={category.id || index} category={category} />
+        ))
+      )}
+    </div>
   );
 }
+
+export default CategoriesList;

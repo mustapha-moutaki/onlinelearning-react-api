@@ -1,9 +1,13 @@
-import CoursList from '../components/courses/CourseList';
+import React from "react";
+import CourseList from "../components/courses/CourseList";
 
-export default function Courses() {
+const Courses = () => {
   return (
-    <div className="p-4">
-      <CoursList />
+    <div>
+      <h2>Available Courses</h2>
+      <CourseList />
     </div>
   );
-}
+};
+
+export default Courses;
