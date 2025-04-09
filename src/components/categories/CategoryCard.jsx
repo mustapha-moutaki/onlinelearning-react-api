@@ -1,33 +1,35 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
 
-function CategoryCard({ category }) {
+function CategoryCard({ category, onEdit }) {
   return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "16px",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        background: "#f9f9f9",
-      }}
-    >
+    <div style={{
+      border: '1px solid #ddd',
+      borderRadius: '5px',
+      padding: '15px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }}>
       <h3>{category.name}</h3>
       {category.description && <p>{category.description}</p>}
-      <Link
-        to={`/courses?category=${category.id}`}
-        style={{
-          display: "inline-block",
-          marginTop: "10px",
-          padding: "8px 16px",
-          background: "#28a745",
-          color: "white",
-          textDecoration: "none",
-          borderRadius: "4px",
-        }}
-      >
-        View Courses
-      </Link>
+      
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end',
+        marginTop: '15px'
+      }}>
+        <button
+          onClick={onEdit}
+          style={{
+            backgroundColor: '#2196F3',
+            color: 'white',
+            padding: '5px 10px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          Edit
+        </button>
+      </div>
     </div>
   );
 }
