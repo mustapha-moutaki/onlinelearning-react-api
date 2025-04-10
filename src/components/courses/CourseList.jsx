@@ -7,10 +7,12 @@
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [formError, setFormError] = useState(null); // Add specific form error state
+    const [formError, setFormError] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [currentCourse, setCurrentCourse] = useState(null);
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
     const [formData, setFormData] = useState({
       title: '',
       description: '',
@@ -67,7 +69,7 @@
       setFormData({
         title: course.title || '',
         description: course.description || '',
-        category_id: course.category_id?.toString() || '', // Ensure category_id is a string
+        category_id: course.category_id?.toString() || '',
         video_url: course.video_url || '',
         price: course.price || ''
       });
@@ -91,15 +93,12 @@
     };
 
     const preprocessFormData = (data) => {
-      // Create a new object to avoid modifying the original
       const processedData = { ...data };
       
-      // Ensure category_id is a number if it's not empty
       if (processedData.category_id) {
         processedData.category_id = parseInt(processedData.category_id, 10);
       }
       
-      // Ensure price is a number if it's not empty
       if (processedData.price !== '') {
         processedData.price = parseFloat(processedData.price);
       }
@@ -109,7 +108,7 @@
 
     const handleAddCourse = async (e) => {
       e.preventDefault();
-      setFormError(null); // Clear previous errors
+      setFormError(null);
       
       try {
         const processedData = preprocessFormData(formData);
@@ -122,7 +121,6 @@
       } catch (error) {
         console.error('Error adding course:', error);
         
-        // Handle validation errors from the server
         if (error.response && error.response.data && error.response.data.errors) {
           const errorMessages = Object.values(error.response.data.errors).flat().join(', ');
           setFormError(`Validation error: ${errorMessages}`);
@@ -136,7 +134,7 @@
       e.preventDefault();
       if (!currentCourse) return;
       
-      setFormError(null); // Clear previous errors
+      setFormError(null);
       
       try {
         const processedData = preprocessFormData(formData);
@@ -149,7 +147,6 @@
       } catch (error) {
         console.error('Error updating course:', error);
         
-        // Handle validation errors from the server
         if (error.response && error.response.data && error.response.data.errors) {
           const errorMessages = Object.values(error.response.data.errors).flat().join(', ');
           setFormError(`Validation error: ${errorMessages}`);
@@ -159,13 +156,108 @@
       }
     };
 
+    // Search functionality
+    const handleSearchChange = (e) => {
+      setSearchKeyword(e.target.value);
+    };
+
+    const handleSearch = async (e) => {
+      e.preventDefault();
+      if (!searchKeyword.trim()) {
+        // If search is empty, fetch all courses
+        fetchData();
+        return;
+      }
+
+      setIsSearching(true);
+      setLoading(true);
+      
+      try {
+        console.log('Searching courses with keyword:', searchKeyword);
+        const response = await axios.get(`http://127.0.0.1:8000/api/V3/courses/search?keyword=${encodeURIComponent(searchKeyword)}`);
+        console.log('Search results:', response.data);
+        
+        setCourses(Array.isArray(response.data) ? response.data : []);
+        setLoading(false);
+        setIsSearching(false);
+      } catch (error) {
+        console.error('Error searching courses:', error);
+        setError('Failed to search courses');
+        setLoading(false);
+        setIsSearching(false);
+      }
+    };
+
+    const clearSearch = () => {
+      setSearchKeyword('');
+      fetchData();
+    };
+
     if (loading && courses.length === 0) return <p>Loading courses...</p>;
     if (error && courses.length === 0) return <p>Error: {error}</p>;
 
     return (
       <div>
+        {/* Search bar */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          marginBottom: '20px', 
+          background: 'white', 
+          padding: '10px', 
+          borderRadius: '5px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <form onSubmit={handleSearch} style={{ display: 'flex', width: '100%' }}>
+            <input
+              type="text"
+              value={searchKeyword}
+              onChange={handleSearchChange}
+              placeholder="Search courses by title or description..."
+              style={{
+                flex: 1,
+                padding: '10px 15px',
+                border: '1px solid #ddd',
+                borderRadius: '4px 0 0 4px',
+                fontSize: '16px'
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                backgroundColor: '#A855F7',
+                color: 'white',
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '0 4px 4px 0',
+                cursor: 'pointer'
+              }}
+            >
+              {isSearching ? 'Searching...' : 'Search'}
+            </button>
+          </form>
+          
+          {searchKeyword && (
+            <button
+              onClick={clearSearch}
+              style={{
+                backgroundColor: 'transparent',
+                color: '#666',
+                padding: '10px 15px',
+                border: 'none',
+                cursor: 'pointer',
+                marginLeft: '10px'
+              }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2>Available Courses</h2>
+          <h2>
+            {searchKeyword ? `Search Results for "${searchKeyword}"` : 'Available Courses'}
+          </h2>
           <button 
             onClick={openAddModal}
             style={{
@@ -182,7 +274,7 @@
         </div>
 
         {courses.length === 0 ? (
-          <p>No courses available</p>
+          <p>{searchKeyword ? `No courses found matching "${searchKeyword}"` : 'No courses available'}</p>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
             {courses.map((course, index) => (
@@ -222,7 +314,6 @@
             }}>
               <h3>Add New Course</h3>
               
-              {/* Display form errors */}
               {formError && (
                 <div style={{ 
                   backgroundColor: '#ffebee', 
@@ -370,7 +461,6 @@
             }}>
               <h3>Edit Course</h3>
               
-              {/* Display form errors */}
               {formError && (
                 <div style={{ 
                   backgroundColor: '#ffebee', 
