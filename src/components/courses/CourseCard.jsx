@@ -69,6 +69,7 @@ function CourseCard({ course, categories, onEdit, onDelete }) {
             if (window.confirm('Are you sure you want to delete this course?')) {
               onDelete(course.id);
             }
+            
           }}
           style={{
             backgroundColor: '#f44336',
