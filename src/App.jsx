@@ -4,7 +4,9 @@ import Layout from "./pages/Layouts";
 import Categories from "./pages/Categories";
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
+import Tags from "./pages/Tag";
 
+import Statistics from './pages/Statistics';
 function App() {
   return (
     <BrowserRouter>
@@ -13,6 +15,10 @@ function App() {
           <Route index element={<Home />} />
           <Route path="categories" element={<Categories />} />
           <Route path="courses" element={<Courses />} />
+         
+        <Route path="/statistics" element={<Statistics />} />
+        <Route path="tags" element={<Tags />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

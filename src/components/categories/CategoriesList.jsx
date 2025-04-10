@@ -54,6 +54,22 @@ function CategoriesList() {
     setIsEditModalOpen(true);
   };
 
+  // Direct delete function without confirmation
+  const handleDeleteCategory = (categoryId) => {
+    setLoading(true);
+    axios
+      .delete(`http://127.0.0.1:8000/api/categories/${categoryId}`)
+      .then((response) => {
+        console.log("Category deleted:", response.data);
+        fetchCategories();
+      })
+      .catch((error) => {
+        console.error("Error deleting category:", error);
+        setError("Failed to delete category");
+        setLoading(false);
+      });
+  };
+
   const handleAddCategory = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -91,7 +107,9 @@ function CategoriesList() {
       });
   };
 
-  if (loading && categories.length === 0) return <p>Loading categories...</p>;
+  if (loading && categories.length === 0){
+    return <p>Loading categories...</p>;
+  } 
   if (error && categories.length === 0) return <p>Error: {error}</p>;
 
   return (
@@ -113,7 +131,6 @@ function CategoriesList() {
         </button>
       </div>
 
-  
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px" }}>
         {categories.length === 0 ? (
           <p>No categories available</p>
@@ -123,6 +140,7 @@ function CategoriesList() {
               key={category.id || index} 
               category={category} 
               onEdit={() => openEditModal(category)}
+              onDelete={() => handleDeleteCategory(category.id)} // Direct delete without confirmation
             />
           ))
         )}

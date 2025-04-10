@@ -15,6 +15,12 @@ const Layout = () => {
           <li>
             <Link to="/courses">Courses</Link>
           </li>
+          <li>
+            <Link to="/statistics">Statistics</Link>
+          </li>
+          <li>
+            <Link to="/tags">Tags</Link>
+          </li>
         </ul>
       </nav>
       <main style={{ padding: "0 20px" }}>
