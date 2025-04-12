@@ -42,7 +42,6 @@ function CourseCard({ course, categories, onEdit, onDelete }) {
       
       {course.price !== undefined && <p><strong>Price:</strong> ${course.price}</p>}
       
-      {/* Add update and delete buttons */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between',
@@ -69,7 +68,7 @@ function CourseCard({ course, categories, onEdit, onDelete }) {
             if (window.confirm('Are you sure you want to delete this course?')) {
               onDelete(course.id);
             }
-            
+
           }}
           style={{
             backgroundColor: '#f44336',
